@@ -52,6 +52,7 @@ class HookCore extends ObjectModel
      * @var array List of executed hooks on this page
      */
     public static $executed_hooks = [];
+    public static $tried_hooks = [];
 
     public static $native_module;
 
@@ -766,6 +767,9 @@ class HookCore extends ObjectModel
         $id_shop = null,
         $chain = false
     ) {
+
+        self::$tried_hooks[]  = $hook_name;
+
         if (defined('PS_INSTALLATION_IN_PROGRESS')) {
             return null;
         }

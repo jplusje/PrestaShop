@@ -1782,7 +1782,40 @@ class OrderCore extends ObjectModel
      */
     public static function generateReference()
     {
-        return strtoupper(Tools::passwdGen(9, 'NO_NUMERIC'));
+        if (true) {
+            $orderPrefix = date('yW');
+
+            $sql = 'SELECT MAX(order_reference) AS order_reference FROM '. _DB_PREFIX_ .'avjo_order_reference WHERE order_reference REGEXP \'^'. $orderPrefix .'\'';
+
+            $response = Db::getInstance()->executeS($sql);
+
+            // this is the lowest possible reference id for the current week, calculate from this.
+            $possibleReferenceId = (int)$orderPrefix . '0001';
+
+            if (!isset($response[0]['order_reference']) || ($possibleReferenceId > $response[0]['order_reference'])) {
+                $referenceId = (int)$possibleReferenceId;
+            } else {
+                $referenceId = (int)$response[0]['order_reference'] + 1;
+            }
+
+            while (true) {
+                $insertSucceeded = Db::getInstance()->insert(
+                    'avjo_order_reference',
+                    [
+                        'order_reference' => $referenceId,
+                    ]
+                );
+
+                // if the insert failed, increment the referenceId and try again
+                if (!$insertSucceeded) {
+                    $referenceId += 1;
+                } else {
+                    return $referenceId;
+                }
+            }
+        } else {
+            return strtoupper(Tools::passwdGen(9, 'NO_NUMERIC'));
+        }
     }
 
     public function orderContainProduct($id_product)

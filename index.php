@@ -1,4 +1,13 @@
 <?php
+
+
+function onShutdown() {
+    error_log($_SERVER['REQUEST_METHOD'] .'-'. $_SERVER['REQUEST_URI']);
+    error_log(print_r(HookCore::$tried_hooks, true));
+}
+
+register_shutdown_function ('onShutdown');
+
 /**
  * Copyright since 2007 PrestaShop SA and Contributors
  * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
